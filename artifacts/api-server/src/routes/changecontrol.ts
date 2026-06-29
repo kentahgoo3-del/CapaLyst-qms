@@ -109,6 +109,8 @@ router.post("/changecontrol", async (req, res): Promise<void> => {
     ...parsed.data,
     changeControlNumber,
     status: initialStatus,
+    validationRequired: parsed.data.validationRequired ?? undefined,
+    regulatoryFilingRequired: parsed.data.regulatoryFilingRequired ?? undefined,
   }).returning();
 
   const action = initialStatus === "Draft" ? "Saved as Draft" : "Submitted";
@@ -142,7 +144,7 @@ router.get("/changecontrol/export", async (req, res): Promise<void> => {
   const csvRows = rows.map(r => [
     r.changeControlNumber, r.title, r.changeType, r.status,
     r.siteCoordinator, r.hierarchicResponsible, r.location,
-    r.plannedImplementationDate, r.rationale ?? "",
+    r.plannedImplementationDate, r.justification ?? "",
   ].map(esc).join(","));
   const csv = "\uFEFF" + [headers.join(","), ...csvRows].join("\r\n");
   res.setHeader("Content-Type", "text/csv; charset=utf-8");

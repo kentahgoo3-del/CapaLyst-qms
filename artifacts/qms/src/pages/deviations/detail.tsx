@@ -717,7 +717,7 @@ import React, { useState, useEffect, useCallback } from "react";
 
     /* ── Computed values ── */
     const isClosed = dev.status === "Closed";
-    const wfStatus: string = (dev as Record<string, unknown>).workflowStatus as string ??
+    const wfStatus: string = (dev as unknown as Record<string, unknown>).workflowStatus as string ??
       (dev.status === "Closed" ? "Completed" : dev.status === "Draft" ? "Draft" : "Submitted");
     const isCompleted = wfStatus === "Completed" || isClosed;
 
@@ -1067,8 +1067,8 @@ import React, { useState, useEffect, useCallback } from "react";
 
                 {/* ── Area Responsible Section ── */}
                 <SectionHeader title="Acceptance by Area Responsible" />
-                {wfStatus === "Area_Rejected" && (dev as Record<string, unknown>).areaRejectReason && (
-                  <RejectionBanner reason={(dev as Record<string, unknown>).areaRejectReason as string} by="Area Responsible" />
+                {wfStatus === "Area_Rejected" && !!(dev as unknown as Record<string, unknown>).areaRejectReason && (
+                  <RejectionBanner reason={(dev as unknown as Record<string, unknown>).areaRejectReason as string} by="Area Responsible" />
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1.5">
@@ -1127,8 +1127,8 @@ import React, { useState, useEffect, useCallback } from "react";
 
                 {/* ── QA Section ── */}
                 <SectionHeader title="Acceptance by Quality Expert" />
-                {wfStatus === "QA_Rejected" && (dev as Record<string, unknown>).qaRejectReason && (
-                  <RejectionBanner reason={(dev as Record<string, unknown>).qaRejectReason as string} by="QA" />
+                {wfStatus === "QA_Rejected" && !!(dev as unknown as Record<string, unknown>).qaRejectReason && (
+                  <RejectionBanner reason={(dev as unknown as Record<string, unknown>).qaRejectReason as string} by="QA" />
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <YesNoRadio

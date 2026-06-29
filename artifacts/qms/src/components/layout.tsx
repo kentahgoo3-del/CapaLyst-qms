@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarSeparator
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, FileWarning, ClipboardList, ShieldAlert, Users, Sun, Moon, FlaskConical, Shield, LogOut, FileBarChart2, Settings2, BarChart2, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, FileWarning, ClipboardList, ShieldAlert, Users, Sun, Moon, FlaskConical, Shield, LogOut, FileBarChart2, Settings2, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
 import { CapalystLogoMark } from "@/components/capalyst-logo";
@@ -34,8 +34,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     location.startsWith("/audit") ? "Audit Trail" :
     location.startsWith("/reports") ? "Reports" :
     location.startsWith("/analytics") ? "Quality Analytics" :
-    location === "/risk/master-plan" ? "Risk Master Plan" :
-    location.startsWith("/risk") ? "Risk Assessments" :
     location.startsWith("/settings") ? "System Settings" : "";
 
   const initials = user?.name?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() ?? "QA";
@@ -96,16 +94,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {isAdmin && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={location.startsWith("/risk")} className="rounded-xl px-3 py-2.5">
-                    <Link href="/risk">
-                      <ShieldCheck />
-                      <span>Risk Assessments</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
               {isAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={location.startsWith("/users")} className="rounded-xl px-3 py-2.5">

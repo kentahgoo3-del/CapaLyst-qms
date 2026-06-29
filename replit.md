@@ -48,6 +48,25 @@ A pharmaceutical Quality Management System for QA professionals in regulated pha
 - **Change Control**: List with approval-chain statuses + detail view showing HR/SC/Expert review workflow
 - **Users**: User table with role badges (QA / User) + add user dialog + role change dialog
 
+## Render Deployment
+
+The `render.yaml` Blueprint defines the full cloud infrastructure (PostgreSQL + API web service). To deploy:
+
+1. **Push to GitHub** (already done — Render auto-deploys on every push to main)
+2. **Create a Render account** at [render.com](https://render.com) if you haven't already
+3. **New → Blueprint** in the Render dashboard → connect your GitHub repo → Render reads `render.yaml` and provisions:
+   - A free PostgreSQL database (`capalyst-db`)
+   - A Node.js web service (`capalyst-api`) with `DATABASE_URL` and `SESSION_SECRET` wired in automatically
+4. **Push the DB schema** after the first deploy (one-time setup):
+   ```
+   DATABASE_URL=<your-render-db-external-url> pnpm --filter @workspace/db run push
+   ```
+   The external connection string is on the Render database's **Info** page under "External Database URL".
+5. **Verify**: `GET https://capalyst-api.onrender.com/api/healthz` → `{"status":"ok"}`
+
+Build command (set in render.yaml): `pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build`
+Start command: `node --enable-source-maps artifacts/api-server/dist/index.mjs`
+
 ## User preferences
 
 _Populate as you build — explicit user instructions worth remembering across sessions._

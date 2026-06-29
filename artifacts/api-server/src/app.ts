@@ -13,6 +13,14 @@ import express, { type Express, type Request, type Response, type NextFunction }
 
   const app: Express = express();
 
+  // Render (and most cloud hosts) terminate TLS at a load balancer; Express
+  // sees plain HTTP. "trust proxy" tells Express to honour the X-Forwarded-*
+  // headers set by the LB, which is required for session cookies with
+  // `secure: true` to be set correctly in production.
+  if (process.env["NODE_ENV"] === "production") {
+    app.set("trust proxy", 1);
+  }
+
   app.use(
     pinoHttp({
       logger,
@@ -42,7 +50,7 @@ import express, { type Express, type Request, type Response, type NextFunction }
       secret: sessionSecret,
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: false, httpOnly: true, maxAge: 8 * 60 * 60 * 1000 },
+      cookie: { secure: process.env["NODE_ENV"] === "production", httpOnly: true, maxAge: 8 * 60 * 60 * 1000 },
     }),
   );
 

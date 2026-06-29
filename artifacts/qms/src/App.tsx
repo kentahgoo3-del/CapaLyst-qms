@@ -28,9 +28,6 @@ import AuditTrailPage from "@/pages/audit-trail";
 import ReportsPage from "@/pages/reports";
 import AnalyticsPage from "@/pages/analytics";
 import SettingsPage from "@/pages/settings";
-import RiskAssessmentList from "@/pages/risk/list";
-import RiskAssessmentDetail from "@/pages/risk/detail";
-import RiskMasterPlan from "@/pages/risk/master-plan";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -178,15 +175,6 @@ function Router() {
           </Route>
           <Route path="/settings">
             <AdminGuard><SettingsPage /></AdminGuard>
-          </Route>
-          <Route path="/risk/master-plan">
-            <AdminGuard><RiskMasterPlan /></AdminGuard>
-          </Route>
-          <Route path="/risk">
-            <AdminGuard><RiskAssessmentList /></AdminGuard>
-          </Route>
-          <Route path="/risk/:id">
-            <AdminGuard><RiskAssessmentDetail /></AdminGuard>
           </Route>
           <Route component={NotFound} />
         </Switch>
