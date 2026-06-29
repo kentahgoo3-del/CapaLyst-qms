@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capalyst QMS - Client Overview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0d1b2e;
+      --navy2:  #132033;
+      --blue:   #1e4a8c;
+      --accent: #3b82f6;
+      --teal:   #0ea5e9;
+      --gold:   #f59e0b;
+      --green:  #10b981;
+      --purple: #8b5cf6;
+      --rose:   #f43f5e;
+      --light:  #f0f6ff;
+      --muted:  #64748b;
+      --text:   #0f172a;
+    }
+
+    html, body {
+      font-family: 'Inter', sans-serif;
+      background: #e8edf4;
+      color: var(--text);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, #162844 60%, #1a3560 100%);
+      padding: 24px 28px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: -30px; left: 30%;
+      width: 300px; height: 120px;
+      background: radial-gradient(ellipse, rgba(14,165,233,0.10) 0%, transparent 70%);
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+    .logo-wordmark {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      font-family: 'Inter', sans-serif;
+    }
+    .header-badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 4px 14px;
+      color: rgba(255,255,255,0.85);
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .header-hero {
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .header-hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+    .header-hero h1 span {
+      background: linear-gradient(90deg, #60a5fa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-hero p {
+      margin-top: 8px;
+      color: rgba(255,255,255,0.65);
+      font-size: 11px;
+      font-weight: 400;
+      max-width: 340px;
+      line-height: 1.5;
+    }
+    .header-stats {
+      display: flex;
+      gap: 0;
+      margin-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 14px;
+    }
+    .stat {
+      flex: 1;
+      padding-right: 16px;
+    }
+    .stat:not(:last-child) {
+      border-right: 1px solid rgba(255,255,255,0.12);
+      margin-right: 16px;
+    }
+    .stat-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+    .stat-num span {
+      color: #60a5fa;
+    }
+    .stat-label {
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* ── INTRO STRIP ─────────────────────────────────────── */
+    .intro-strip {
+      background: var(--light);
+      border-bottom: 2px solid #dbeafe;
+      padding: 11px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .intro-strip-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--accent), var(--teal));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .intro-strip-icon svg { width: 14px; height: 14px; stroke: #fff; fill: none; }
+    .intro-strip p {
+      font-size: 10.5px;
+      color: var(--blue);
+      font-weight: 500;
+      line-height: 1.45;
+    }
+    .intro-strip p strong { color: var(--navy); font-weight: 700; }
+
+    /* ── MODULES GRID ────────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 28px 8px;
+    }
+    .section-label span {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 28px 8px;
+    }
+    .module-card {
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      background: #fff;
+    }
+    .module-card-header {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 13px 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .module-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .module-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 1.8; }
+    .module-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+    .module-card-sub {
+      font-size: 8.5px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 1px;
+    }
+    .module-card-body {
+      padding: 9px 13px 11px;
+    }
+    .module-card-body ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .module-card-body li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 9.5px;
+      color: #475569;
+      line-height: 1.4;
+    }
+    .module-card-body li::before {
+      content: "✓";
+      font-size: 8.5px;
+      font-weight: 700;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .mod-deviations .module-icon { background: linear-gradient(135deg, #ef4444, #f97316); }
+    .mod-deviations li::before { color: #ef4444; }
+    .mod-deviations .module-card-header { background: linear-gradient(135deg, #fff5f5, #fff7ed); }
+
+    .mod-capa .module-icon { background: linear-gradient(135deg, var(--accent), #6366f1); }
+    .mod-capa li::before { color: var(--accent); }
+    .mod-capa .module-card-header { background: linear-gradient(135deg, #eff6ff, #eef2ff); }
+
+    .mod-cc .module-icon { background: linear-gradient(135deg, var(--green), #0891b2); }
+    .mod-cc li::before { color: var(--green); }
+    .mod-cc .module-card-header { background: linear-gradient(135deg, #f0fdf4, #ecfeff); }
+
+    .mod-analytics .module-icon { background: linear-gradient(135deg, var(--purple), #ec4899); }
+    .mod-analytics li::before { color: var(--purple); }
+    .mod-analytics .module-card-header { background: linear-gradient(135deg, #faf5ff, #fdf2f8); }
+
+    /* ── COMPLIANCE STRIP ──────────────────────────────────── */
+    .compliance-strip {
+      margin: 4px 28px 8px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+      border-radius: 10px;
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .compliance-strip-text {
+      flex: 1;
+    }
+    .compliance-strip-text h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+    .compliance-strip-text p {
+      font-size: 9px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.45;
+    }
+    .compliance-pills {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 8.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+    }
+
+    /* ── BOTTOM FEATURES ────────────────────────────────── */
+    .features-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 0 28px 10px;
+    }
+    .feature-item {
+      background: var(--light);
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      padding: 10px 10px 9px;
+      text-align: center;
+    }
+    .feature-item .fi-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px;
+    }
+    .feature-item .fi-icon svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 1.8; }
+    .feature-item .fi-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .feature-item .fi-desc {
+      font-size: 8px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────── */
+    .footer {
+      margin-top: auto;
+      background: var(--navy);
+      padding: 11px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-left img {
+      height: 18px;
+      filter: brightness(0) invert(1) opacity(0.7);
+    }
+    .footer-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.2);
+    }
+    .footer-tagline {
+      font-size: 8px;
+      color: rgba(255,255,255,0.45);
+      font-style: italic;
+      letter-spacing: 0.04em;
+    }
+    .footer-right {
+      font-size: 8px;
+      color: rgba(255,255,255,0.4);
+      text-align: right;
+      line-height: 1.5;
+    }
+    .footer-right strong {
+      color: rgba(255,255,255,0.7);
+      font-weight: 600;
+      font-size: 9px;
+    }
+
+    /* ── PRINT ─────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; margin: 0; }
+      .page {
+        margin: 0;
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+      }
+    }
+
+    @media screen and (max-width: 800px) {
+      .page { width: 100%; margin: 0; }
+      .modules-grid { grid-template-columns: 1fr; }
+      .features-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-wordmark">Capalyst</div>
+      <div class="header-badge">Pharmaceutical QMS Platform</div>
+    </div>
+    <div class="header-hero">
+      <h1>Quality. Compliance.<br/><span>Fully Under Control.</span></h1>
+      <p>A purpose-built Quality Management System for pharma and biotech - unifying Deviations, CAPA, Change Control, and Quality Intelligence in one regulated platform.</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-label">Audit-Trail Coverage</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Integrated QMS Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">21<span> CFR</span></div>
+        <div class="stat-label">Part 11 Ready</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">E2E</div>
+        <div class="stat-label">Workflow Automation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTRO STRIP -->
+  <div class="intro-strip">
+    <div class="intro-strip-icon">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <p><strong>Capalyst replaces disconnected spreadsheets and paper-based workflows</strong> with a single, validated digital platform - giving your QA team real-time visibility, enforced SOPs, and an unbroken audit trail from deviation to closure.</p>
+  </div>
+
+  <!-- MODULES -->
+  <div class="section-label">
+    <span>Core Modules</span>
+  </div>
+
+  <div class="modules-grid">
+
+    <!-- Deviations -->
+    <div class="module-card mod-deviations">
+      <div class="module-card-header">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="module-card-title">Deviation Management</div>
+          <div class="module-card-sub">Capture, investigate, and close - end to end</div>
+        </div>
+      </div>
+      <div class="module-card-body">
+        <ul>
+          <li>Structured intake with area, product, and batch classification</li>
+          <li>Tabbed investigation workflow: root cause, impact, and QA acceptance</li>
+          <li>Automatic overdue flagging with escalation indicators</li>
+          <li>Seamless link to CAPA records from within each deviation</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CAPA -->
+    <div class="module-card mod-capa">
+      <div class="module-card-header">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="module-card-title">CAPA &amp; Efficacy Reviews</div>
+          <div class="module-card-sub">From action plan to verified effectiveness</div>
+        </div>
+      </div>
+      <div class="module-card-body">
+        <ul>
+          <li>Role-gated 6-stage workflow: Draft → Approved → Implemented → Verified</li>
+          <li>Electronic signatures with timestamp for every state transition</li>
+          <li>Built-in Efficacy Review module to confirm CAPA effectiveness</li>
+          <li>Full deviation linkage - trace every action back to its source</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Change Control -->
+    <div class="module-card mod-cc">
+      <div class="module-card-header">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="module-card-title">Change Control</div>
+          <div class="module-card-sub">Multi-tier approval for controlled changes</div>
+        </div>
+      </div>
+      <div class="module-card-body">
+        <ul>
+          <li>Structured 3-tier review chain: HR → Subject Matter Expert → SC</li>
+          <li>Each reviewer has an independent approve / reject / abstain action</li>
+          <li>Automatic status progression with full decision audit trail</li>
+          <li>Change category and risk impact captured at initiation</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="module-card mod-analytics">
+      <div class="module-card-header">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="module-card-title">Dashboard &amp; Analytics</div>
+          <div class="module-card-sub">Live quality intelligence at a glance</div>
+        </div>
+      </div>
+      <div class="module-card-body">
+        <ul>
+          <li>Executive KPI cards: open deviations, overdue CAPAs, CCs in review</li>
+          <li>Deviation trend chart and area-breakdown bar chart</li>
+          <li>Quality Analytics with compliance rates and resolution heatmaps</li>
+          <li>Report generator with printable quality summaries</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPLIANCE STRIP -->
+  <div class="compliance-strip">
+    <div class="compliance-strip-text">
+      <h3>Built for Regulated Environments</h3>
+      <p>Every action is logged with user, timestamp, and reason - giving your QA team an unbroken, inspection-ready audit trail across every module, every record, every time.</p>
+    </div>
+    <div class="compliance-pills">
+      <div class="pill">GMP Compliant</div>
+      <div class="pill">21 CFR Part 11</div>
+      <div class="pill">ICH Q10</div>
+      <div class="pill">Role-Based Access</div>
+      <div class="pill">e-Signatures</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM FEATURES -->
+  <div class="section-label">
+    <span>Platform Capabilities</span>
+  </div>
+
+  <div class="features-row">
+    <div class="feature-item">
+      <div class="fi-icon" style="background: linear-gradient(135deg,#3b82f6,#6366f1)">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <div class="fi-title">User Administration</div>
+      <div class="fi-desc">Role-based access control with QA Admin and User tiers</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon" style="background: linear-gradient(135deg,#10b981,#0ea5e9)">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div class="fi-title">Audit Trail</div>
+      <div class="fi-desc">Immutable log of every action - who, what, when, and why</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon" style="background: linear-gradient(135deg,#f59e0b,#ef4444)">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+      </div>
+      <div class="fi-title">Smart Notifications</div>
+      <div class="fi-desc">Action-required alerts and activity feed in real time</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-icon" style="background: linear-gradient(135deg,#8b5cf6,#ec4899)">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div class="fi-title">Report Generation</div>
+      <div class="fi-desc">Printable quality reports and compliance summaries on demand</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      <span style="font-size:15px;font-weight:800;color:rgba(255,255,255,0.85);letter-spacing:-0.3px;font-family:'Inter',sans-serif;">Capalyst</span>
+      <div class="footer-divider"></div>
+      <div class="footer-tagline">Where Quality Meets Compliance.</div>
+    </div>
+    <div class="footer-right">
+      <strong>Powered by CPT</strong><br/>
+      Confidential - Client Presentation
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

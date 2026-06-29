@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CPT QMS"
+version = "1.0.0"
+id = "artifacts/qms"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25912
+
+[services.development]
+run = "pnpm --filter @workspace/qms run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/qms", "run", "build" ]
+publicDir = "artifacts/qms/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25912"
+BASE_PATH = "/"

@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/capalyst-showcase/"
+title = "Capalyst QMS — Client Showcase"
+version = "1.0.0"
+id = "artifacts/capalyst-showcase"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/capalyst-showcase/" ]
+localPort = 25610
+
+[services.development]
+run = "pnpm --filter @workspace/capalyst-showcase run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/capalyst-showcase", "run", "build" ]
+publicDir = "artifacts/capalyst-showcase/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25610"
+BASE_PATH = "/capalyst-showcase/"

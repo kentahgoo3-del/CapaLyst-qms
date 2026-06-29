@@ -1,0 +1,122 @@
+[
+  {
+    "id": "a1b2c3d4-0001-4000-8000-000000000001",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Cover.tsx",
+    "title": "Cover",
+    "description": "Opening slide — Capalyst QMS: Pharmaceutical Quality, Reimagined.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0002-4000-8000-000000000002",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02Problem.tsx",
+    "title": "The Problem",
+    "description": "$50M hook — pain points of paper trails, manual sign-offs, and audit panic.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0003-4000-8000-000000000003",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03Solution.tsx",
+    "title": "What Capalyst Is",
+    "description": "One platform, four critical modules — icon grid overview of Deviations, CAPA, Change Control, Audit Trail.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0004-4000-8000-000000000004",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04Architecture.tsx",
+    "title": "How It Works",
+    "description": "System architecture: Users & Roles → QMS Modules → Audit Trail.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0005-4000-8000-000000000005",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05Dashboard.tsx",
+    "title": "Dashboard",
+    "description": "Live quality dashboard — KPI cards and 30-day deviation trend chart.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0006-4000-8000-000000000006",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06DeviationFlow.tsx",
+    "title": "Deviation Lifecycle",
+    "description": "Swimlane flowchart: Draft → Submitted → Area Review → QA Acceptance → Investigation → Root Cause → CAPA/ER → Completed, with e-sig gates.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0007-4000-8000-000000000007",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07CapaFlow.tsx",
+    "title": "CAPA Lifecycle",
+    "description": "Linear flowchart: Draft → QA Review → Implementation → Efficacy Review → Closed, with efficacy loop.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0008-4000-8000-000000000008",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08ChangeControl.tsx",
+    "title": "Change Control Pipeline",
+    "description": "Parallel-lane diagram: Submitted → HR/SC/Expert reviews → Works Plan → PIR → Close.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0009-4000-8000-000000000009",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Compliance.tsx",
+    "title": "Compliance & Audit Trail",
+    "description": "Supported frameworks — 21 CFR Part 11, EU GMP Annex 11, ICH Q10, ISO 13485 — plus immutable log visual.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0010-4000-8000-000000000010",
+    "position": 10,
+    "filepath": "src/pages/slides/Slide10ESignatures.tsx",
+    "title": "E-Signatures & Role-Based Access",
+    "description": "Split visual: roles on the left, what each can do on the right.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0011-4000-8000-000000000011",
+    "position": 11,
+    "filepath": "src/pages/slides/Slide11Differentiators.tsx",
+    "title": "Key Differentiators",
+    "description": "3-column comparison: Paper/spreadsheets vs Generic tools vs Capalyst.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0012-4000-8000-000000000012",
+    "position": 12,
+    "filepath": "src/pages/slides/Slide12ROI.tsx",
+    "title": "ROI & Value Props",
+    "description": "Three stat hero cards: 60% faster audit prep, 40% faster deviation closure, $2M+ per recall avoided.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0013-4000-8000-000000000013",
+    "position": 13,
+    "filepath": "src/pages/slides/Slide13Onboarding.tsx",
+    "title": "Implementation & Onboarding",
+    "description": "3-phase timeline: Setup (weeks 1–2), Training (weeks 3–4), Go-Live (week 5+).",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0014-4000-8000-000000000014",
+    "position": 14,
+    "filepath": "src/pages/slides/Slide14CustomerFit.tsx",
+    "title": "Customer Fit",
+    "description": "Persona cards: QA Manager, Compliance Officer, Site Director.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0015-4000-8000-000000000015",
+    "position": 15,
+    "filepath": "src/pages/slides/Slide15CTA.tsx",
+    "title": "Request a Demo",
+    "description": "Closing CTA — Ready to see it live? Contact and demo request details.",
+    "speakerNotes": ""
+  }
+]

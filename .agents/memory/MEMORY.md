@@ -1,0 +1,8 @@
+- [QMS build lessons](qms-build-lessons.md) — pitfalls specific to this contract-first pnpm monorepo stack
+- [CAPA Workflow Engine](capa-workflow.md) — 6-state role-gated workflow with e-sig; session roles pattern is `req.session.userRoles.includes("QA")`.
+- [Deviation workflowStatus display](deviation-wf-display.md) — deviation list WfStatusBadge uses `as unknown as Record<string,unknown>` cast pattern; deviations/detail.tsx has pre-existing TS2352 errors (unfixed, unrelated).
+- [Notifications endpoint](notifications-endpoint.md) — `/api/notifications` queries pending workflow actions for current user; bell shows "Action Required" vs "Recent Activity" sections.
+- [useDebounce hook](use-debounce.md) — added at `artifacts/qms/src/hooks/use-debounce.ts`; used in all 5 list/search pages (deviations, capa, cc, audit-trail, users) with 400ms delay.
+- [FMEA inline worksheet pattern](fmea-inline-worksheet.md) — tuple spread in jsPDF needs `(...((a?b:c) as [n,n,n]))` not `...(a?b:c as [n,n,n])`; Lucide icons reject `title` prop, wrap in `<span title>` instead; ICH Q9 scales S={1,2,3,5,10} O={1,2,3,8,10} D={1,2,3,4,5}; RPN thresholds High≥120 Medium≥36.
+- [Orval inline body naming conflict](orval-inline-body-conflict.md) — inline anonymous requestBody schemas in OpenAPI cause TS2308 duplicate export between api.ts and types/; fix by using named $ref schemas in components/schemas instead.
+- [RA sub-entity field names](ra-field-names.md) — exact field/param names for RaTeamMember, RaCommunicationEntry, RaLink, RaClassifyInput, RaReviewReport, closeRiskAssessment mutations.

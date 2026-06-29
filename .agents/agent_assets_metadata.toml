@@ -1,0 +1,133 @@
+uploads = []
+
+[[generated]]
+id = "b3YRxB3aVUJ7XGyLwDxKJ"
+uri = "file://artifacts/capalyst-showcase/public/assets/particle-texture.png"
+type = "image"
+title = "blue mint particle texture"
+
+[[generated]]
+id = "MnhSj4wowp_FDoPkaeK2E"
+uri = "file://artifacts/capalyst-showcase/public/assets/clean-room.png"
+type = "image"
+title = "clean room background"
+
+[[generated]]
+id = "871GMeonbGwdXZhJSAd9c"
+uri = "file://artifacts/capalyst-showcase/public/images/pharma-lab-bg.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "8xC5as6xme85ThaRDgODE"
+uri = "file://artifacts/capalyst-showcase/public/images/particle-texture.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "8UUoyOFy7EMm9Xxffej2z"
+uri = "file://artifacts/capalyst-showcase/public/images/clinical-env-bg.png"
+type = "image"
+title = "generated_image"
+
+[[outputs]]
+id = "uk32cQM49_VZr_hn30Q_r"
+uri = "file://Capalyst_QMS_User_Guide.docx"
+type = "word_document"
+title = "Capalyst QMS — Working Instructions v1.0"
+
+[[outputs]]
+id = "hU-DHeQejHPKV6vW_0EWB"
+uri = "file://artifacts/capalyst-showcase/public/assets/clinical-stock.jpg"
+type = "image"
+title = "clinical environment, pharmaceutical compliance, pristine, professional"
+
+[[outputs]]
+id = "nb7TYgyyZ5LL4uvRLNLi6"
+uri = "file://capalyst-pamphlet.zip"
+type = "unspecified"
+title = "Capalyst Client Pamphlet"
+
+[[outputs]]
+id = "-koACqS7yS92SHvHVVn2p"
+uri = "file://validation_package/Capalyst_Validation_Package.zip"
+type = "unspecified"
+title = "Capalyst CSV Validation Package (13 documents)"
+
+[[outputs]]
+id = "6RV1uVQq8ytPtXM5sjI-t"
+uri = "file://validation_package/01_CPT-VL-ISVP-PP_Capalyst-001_Project_Plan.docx"
+type = "word_document"
+title = "01 — Project Plan"
+
+[[outputs]]
+id = "-0r8WLYGggNFEGIp1k9_X"
+uri = "file://validation_package/02_CPT-VL-ISVP-SCA_Capalyst-001_System_Criticality_Assessment.docx"
+type = "word_document"
+title = "02 — System Criticality Assessment"
+
+[[outputs]]
+id = "bMEDnAMUmTK2NMJtm3Nba"
+uri = "file://validation_package/03_CPT-VL-ISVP-UR_Capalyst-001_User_Requirements.docx"
+type = "word_document"
+title = "03 — User Requirements Specification"
+
+[[outputs]]
+id = "oPpGLMLAP0bC2NQf_TWMX"
+uri = "file://validation_package/04_CPT-VL-ISVP-VP_Capalyst-001_Validation_Plan.docx"
+type = "word_document"
+title = "04 — Validation Plan"
+
+[[outputs]]
+id = "_750gZxaNMN_fd_3NPyZf"
+uri = "file://validation_package/05_CPT-VL-ISVP-ArS_Capalyst-001_Architecture_Specification.docx"
+type = "word_document"
+title = "05 — Architecture Specification"
+
+[[outputs]]
+id = "6VhCGo3VjKCFMFya2pg_8"
+uri = "file://validation_package/06_CPT-VL-ISVP-DMP_Capalyst-001_Data_Migration_Plan.docx"
+type = "word_document"
+title = "06 — Data Migration Plan"
+
+[[outputs]]
+id = "fME8tuNO-5s0_vpAzj7VD"
+uri = "file://validation_package/07_CPT-VL-ISVP-IQ_Capalyst-001_Installation_Qualification.docx"
+type = "word_document"
+title = "07 — Installation Qualification"
+
+[[outputs]]
+id = "R4Qw-PRhTOL0964LWE7ii"
+uri = "file://validation_package/08_CPT-VL-ISVP-IAOM_Capalyst-001_Operations_Manual.docx"
+type = "word_document"
+title = "08 — Infrastructure & Application Operations Manual"
+
+[[outputs]]
+id = "anlOUJYnAQzv23h8GAzxE"
+uri = "file://validation_package/09_CPT-VL-ISVP-TR_Capalyst-001_Test_Report.docx"
+type = "word_document"
+title = "09 — Test Report"
+
+[[outputs]]
+id = "E2slNBprIugoY5rOBQ55x"
+uri = "file://validation_package/10_CPT-VL-ISVP-AFU_Capalyst-001_Authorization_for_Use.docx"
+type = "word_document"
+title = "10 — Authorization for Use"
+
+[[outputs]]
+id = "cx8yS7AtI0LqbOhPesVGx"
+uri = "file://validation_package/11_CPT-VL-ISVP-DBC_Capalyst-001_Database_Comparison.docx"
+type = "word_document"
+title = "11 — Database Comparison"
+
+[[outputs]]
+id = "RwKBwn_F7x5itSReHWcgQ"
+uri = "file://validation_package/12_CPT-VL-ISVP-VR_Capalyst-001_Validation_Report.docx"
+type = "word_document"
+title = "12 — Validation Report"
+
+[[outputs]]
+id = "bEhEmOr_RUNpSMGBDKgME"
+uri = "file://validation_package/13_CPT-VL-CVP-Capalyst-v1.0.0-001_Version_Release_Notes_Review.docx"
+type = "word_document"
+title = "13 — Version Release Notes Review"

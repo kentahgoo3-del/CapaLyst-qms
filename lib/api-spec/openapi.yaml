@@ -1,0 +1,3585 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Capalyst QMS API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+  - name: dashboard
+  - name: deviations
+  - name: capa
+  - name: changecontrol
+  - name: users
+  - name: auth
+  - name: audit
+  - name: attachments
+  - name: risk-assessment
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary KPIs
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/metrics:
+    get:
+      operationId: getDashboardMetrics
+      tags: [dashboard]
+      summary: Get deviation trend metrics for charts
+      responses:
+        "200":
+          description: Metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardMetrics"
+
+  /dashboard/recent-activity:
+    get:
+      operationId: getDashboardRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Activity list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /deviations:
+    get:
+      operationId: listDeviations
+      tags: [deviations]
+      summary: List all deviations
+      parameters:
+        - in: query
+          name: flag
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Deviations list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviationListResponse"
+
+    post:
+      operationId: createDeviation
+      tags: [deviations]
+      summary: Create a new deviation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deviation"
+
+  /deviations/{id}:
+    get:
+      operationId: getDeviation
+      tags: [deviations]
+      summary: Get deviation detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deviation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deviation"
+
+    patch:
+      operationId: updateDeviation
+      tags: [deviations]
+      summary: Update deviation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviationUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deviation"
+
+  /deviations/{id}/status-counts:
+    get:
+      operationId: getDeviationStatusCounts
+      tags: [deviations]
+      summary: Get deviation counts grouped by status (for dashboard cards)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusCounts"
+
+  /deviations/{id}/similar:
+    get:
+      operationId: getSimilarDeviations
+      tags: [deviations]
+      summary: Get deviations with same location or root cause category in past 12 months
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Similar deviations
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, items]
+                properties:
+                  count:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeviationSimilarItem"
+
+  /deviations/{id}/related:
+    get:
+      operationId: getRelatedDeviations
+      tags: [deviations]
+      summary: Get deviations linked to this deviation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Related deviations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeviationRelatedLink"
+
+    post:
+      operationId: addRelatedDeviation
+      tags: [deviations]
+      summary: Link a related deviation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviationLinkInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviationRelatedLink"
+
+  /deviations/{id}/related/{relatedId}:
+    delete:
+      operationId: removeRelatedDeviation
+      tags: [deviations]
+      summary: Remove a related deviation link
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: relatedId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /deviations/counts:
+    get:
+      operationId: getDeviationCounts
+      tags: [deviations]
+      summary: Get deviation counts grouped by status and type
+      responses:
+        "200":
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviationCounts"
+
+  /capa:
+    get:
+      operationId: listCapa
+      tags: [capa]
+      summary: List all CAPAs
+      parameters:
+        - in: query
+          name: deviationId
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: flag
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: CAPA list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapaListResponse"
+
+    post:
+      operationId: createCapa
+      tags: [capa]
+      summary: Create a new CAPA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapaInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capa"
+
+  /capa/{id}:
+    get:
+      operationId: getCapa
+      tags: [capa]
+      summary: Get CAPA detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: CAPA detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capa"
+
+    patch:
+      operationId: updateCapa
+      tags: [capa]
+      summary: Update CAPA
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapaUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capa"
+
+  /capa/{id}/generate-cc:
+    post:
+      operationId: generateChangeControlFromCapa
+      tags: [capa]
+      summary: Generate a Change Control linked to this CAPA
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Created Change Control
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /capa/{id}/reassign-impl-leader:
+    post:
+      operationId: reassignCapaImplLeader
+      tags: [capa]
+      summary: Reassign implementation leader for a CAPA
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CapaImplLeaderReassign"
+      responses:
+        "200":
+          description: Updated CAPA
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capa"
+
+  /capa/counts:
+    get:
+      operationId: getCapaCounts
+      tags: [capa]
+      summary: Get CAPA counts grouped by status
+      responses:
+        "200":
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapaCounts"
+
+  /changecontrol:
+    get:
+      operationId: listChangeControl
+      tags: [changecontrol]
+      summary: List all change controls
+      parameters:
+        - in: query
+          name: flag
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: capaId
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Change control list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControlListResponse"
+
+    post:
+      operationId: createChangeControl
+      tags: [changecontrol]
+      summary: Create a new change control
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeControlInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /changecontrol/{id}:
+    get:
+      operationId: getChangeControl
+      tags: [changecontrol]
+      summary: Get change control detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Change control detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+    patch:
+      operationId: updateChangeControl
+      tags: [changecontrol]
+      summary: Update change control
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeControlUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /changecontrol/{id}/close:
+    post:
+      operationId: closeChangeControl
+      tags: [changecontrol]
+      summary: Close a change control with a comment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeControlCloseInput"
+      responses:
+        "200":
+          description: Closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /changecontrol/{id}/expert-reviews:
+    get:
+      operationId: listChangeControlExpertReviews
+      tags: [changecontrol]
+      summary: List expert review assignments for a change control
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expert reviews list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcExpertReviewListResponse"
+
+    post:
+      operationId: createChangeControlExpertReviews
+      tags: [changecontrol]
+      summary: Create expert review assignments (start expert review phase)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CcExpertReviewBulkInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcExpertReviewListResponse"
+
+  /changecontrol/{id}/expert-reviews/accept:
+    post:
+      operationId: acceptChangeControlExpertReviews
+      tags: [changecontrol]
+      summary: Accept all expert reviews (move to works plan)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /changecontrol/{id}/expert-reviews/reject:
+    post:
+      operationId: rejectChangeControlExpertReviews
+      tags: [changecontrol]
+      summary: Reject expert reviews with a reason
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeControlRejectInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeControl"
+
+  /changecontrol/expert-reviews/{reviewId}:
+    patch:
+      operationId: submitChangeControlExpertReview
+      tags: [changecontrol]
+      summary: Submit an expert review (only the assigned manager may call this)
+      parameters:
+        - in: path
+          name: reviewId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CcExpertReviewUpdate"
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcExpertReview"
+
+  /changecontrol/expert-reviews/{reviewId}/reassign:
+    patch:
+      operationId: reassignChangeControlExpertReview
+      tags: [changecontrol]
+      summary: Reassign an expert review to a different manager (QA/Admin/SC only)
+      parameters:
+        - in: path
+          name: reviewId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CcExpertReviewReassign"
+      responses:
+        "200":
+          description: Reassigned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcExpertReview"
+
+  /changecontrol/{id}/work-plans:
+    get:
+      operationId: listChangeControlWorkPlans
+      tags: [changecontrol]
+      summary: List work plan items for a change control
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Work plans list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcWorkPlanListResponse"
+
+    post:
+      operationId: createChangeControlWorkPlans
+      tags: [changecontrol]
+      summary: Create work plan items (start works plan phase)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CcWorkPlanBulkInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcWorkPlanListResponse"
+
+  /changecontrol/work-plans/{planId}:
+    delete:
+      operationId: deleteChangeControlWorkPlan
+      tags: [changecontrol]
+      summary: Delete a work plan item
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+
+    patch:
+      operationId: submitChangeControlWorkPlan
+      tags: [changecontrol]
+      summary: Submit a completed work plan item
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CcWorkPlanUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CcWorkPlan"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create / add a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete a user (Admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user role and department
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /user-role-definitions:
+    get:
+      operationId: listUserRoleDefinitions
+      tags: [users]
+      summary: List all defined user roles (built-in + custom)
+      responses:
+        "200":
+          description: Role definitions list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserRoleDefinition"
+    post:
+      operationId: createUserRoleDefinition
+      tags: [users]
+      summary: Create a new custom user role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRoleDefinitionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRoleDefinition"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout current session
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getAuthMe
+      tags: [auth]
+      summary: Get currently logged-in user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
+
+  /audit:
+    get:
+      operationId: listAuditLogs
+      tags: [audit]
+      summary: List audit log entries
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: module
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogListResponse"
+
+  /attachments:
+    get:
+      operationId: listAttachments
+      tags: [attachments]
+      summary: List attachments for a record
+      parameters:
+        - in: query
+          name: module
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: recordId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Attachments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttachmentMeta"
+
+  /attachments/{id}:
+    delete:
+      operationId: deleteAttachment
+      tags: [attachments]
+      summary: Delete an attachment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+
+  /deviations/{id}/generate-capa:
+    post:
+      operationId: generateCapaFromDeviation
+      tags: [deviations]
+      summary: Generate a CAPA from a deviation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Created CAPA
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capa"
+
+  /capa/er:
+    get:
+      operationId: listEfficacyReviews
+      tags: [capa]
+      summary: List all efficacy reviews
+      parameters:
+        - in: query
+          name: capaId
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: flag
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: page
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: pageSize
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Efficacy review list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EfficacyReviewListResponse"
+
+    post:
+      operationId: createEfficacyReview
+      tags: [capa]
+      summary: Create a new efficacy review for a CAPA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EfficacyReviewInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EfficacyReview"
+
+  /capa/er/{id}:
+    get:
+      operationId: getEfficacyReview
+      tags: [capa]
+      summary: Get efficacy review detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Efficacy review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EfficacyReview"
+
+    patch:
+      operationId: updateEfficacyReview
+      tags: [capa]
+      summary: Update an efficacy review
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EfficacyReviewUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EfficacyReview"
+
+  /settings/options:
+    get:
+      operationId: listSettingOptions
+      tags: [settings]
+      summary: List configurable dropdown options, optionally filtered by category
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: List of setting options
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SettingOption"
+    post:
+      operationId: createSettingOption
+      tags: [settings]
+      summary: Add a new option to a configurable list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingOptionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingOption"
+
+  /settings/options/{id}:
+    delete:
+      operationId: deleteSettingOption
+      tags: [settings]
+      summary: Remove a configurable option by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /risk-assessments:
+    get:
+      operationId: listRiskAssessments
+      tags: [risk-assessment]
+      summary: List risk assessments
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: pageSize
+          in: query
+          schema: { type: integer }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: assessmentType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of risk assessments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessmentListResponse"
+    post:
+      operationId: createRiskAssessment
+      tags: [risk-assessment]
+      summary: Create a new risk assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskAssessmentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}:
+    get:
+      operationId: getRiskAssessment
+      tags: [risk-assessment]
+      summary: Get a risk assessment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Risk assessment record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+    put:
+      operationId: updateRiskAssessment
+      tags: [risk-assessment]
+      summary: Update a risk assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskAssessmentInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/submit:
+    post:
+      operationId: submitRiskAssessment
+      tags: [risk-assessment]
+      summary: Submit risk assessment for QA review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/approve:
+    post:
+      operationId: approveRiskAssessment
+      tags: [risk-assessment]
+      summary: Approve a risk assessment (QA only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/reject:
+    post:
+      operationId: rejectRiskAssessment
+      tags: [risk-assessment]
+      summary: Reject a risk assessment back to Draft (QA only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskAssessmentRejectInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/close:
+    post:
+      operationId: closeRiskAssessment
+      tags: [risk-assessment]
+      summary: Close a risk assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/entries:
+    get:
+      operationId: listFmeaEntries
+      tags: [risk-assessment]
+      summary: List FMEA worksheet entries for a risk assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: List of FMEA entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FmeaEntryListResponse"
+    post:
+      operationId: createFmeaEntry
+      tags: [risk-assessment]
+      summary: Add a FMEA worksheet entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FmeaEntryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FmeaEntry"
+
+  /risk-assessments/{id}/entries/{entryId}:
+    put:
+      operationId: updateFmeaEntry
+      tags: [risk-assessment]
+      summary: Update a FMEA worksheet entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: entryId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FmeaEntryInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FmeaEntry"
+    delete:
+      operationId: deleteFmeaEntry
+      tags: [risk-assessment]
+      summary: Delete a FMEA worksheet entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: entryId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /risk-assessments/master-plan:
+    get:
+      operationId: getRiskMasterPlan
+      tags: [risk-assessment]
+      summary: Get the Risk Management Master Plan
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaMasterPlanResponse"
+
+  /risk-assessments/{id}/team-members:
+    get:
+      operationId: listRaTeamMembers
+      tags: [risk-assessment]
+      summary: List team members for an assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaTeamMemberListResponse"
+    post:
+      operationId: addRaTeamMember
+      tags: [risk-assessment]
+      summary: Add a team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaTeamMemberInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaTeamMember"
+
+  /risk-assessments/{id}/team-members/{memberId}:
+    delete:
+      operationId: deleteRaTeamMember
+      tags: [risk-assessment]
+      summary: Remove a team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /risk-assessments/{id}/team-members/{memberId}/acknowledge:
+    post:
+      operationId: acknowledgeRaTeamMember
+      tags: [risk-assessment]
+      summary: Team member acknowledges the assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaTeamMember"
+
+  /risk-assessments/{id}/communication-log:
+    get:
+      operationId: listRaCommunicationLog
+      tags: [risk-assessment]
+      summary: List communication log entries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaCommunicationEntryListResponse"
+    post:
+      operationId: addRaCommunicationEntry
+      tags: [risk-assessment]
+      summary: Add a communication log entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaCommunicationEntryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaCommunicationEntry"
+
+  /risk-assessments/{id}/communication-log/{logId}:
+    delete:
+      operationId: deleteRaCommunicationEntry
+      tags: [risk-assessment]
+      summary: Delete a communication log entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: logId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /risk-assessments/{id}/review-reports:
+    get:
+      operationId: listRaReviewReports
+      tags: [risk-assessment]
+      summary: List review reports (RARR)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaReviewReportListResponse"
+    post:
+      operationId: createRaReviewReport
+      tags: [risk-assessment]
+      summary: Create a review report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaReviewReportInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaReviewReport"
+
+  /risk-assessments/{id}/review-reports/{rarrId}:
+    put:
+      operationId: updateRaReviewReport
+      tags: [risk-assessment]
+      summary: Update a review report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: rarrId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaReviewReportInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaReviewReport"
+
+  /risk-assessments/{id}/links:
+    get:
+      operationId: listRaLinks
+      tags: [risk-assessment]
+      summary: List cross-module links
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaLinkListResponse"
+    post:
+      operationId: addRaLink
+      tags: [risk-assessment]
+      summary: Add a cross-module link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaLinkInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaLink"
+
+  /risk-assessments/{id}/links/{linkId}:
+    delete:
+      operationId: deleteRaLink
+      tags: [risk-assessment]
+      summary: Remove a cross-module link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: linkId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /risk-assessments/{id}/classify:
+    post:
+      operationId: classifyRiskAssessment
+      tags: [risk-assessment]
+      summary: Set risk class and next review date
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaClassifyInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/re-assess:
+    post:
+      operationId: reAssessRiskAssessment
+      tags: [risk-assessment]
+      summary: Create a new version (re-assessment)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "201":
+          description: New assessment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAssessment"
+
+  /risk-assessments/{id}/entries/{entryId}/generate-capa:
+    post:
+      operationId: generateCapaFromEntry
+      tags: [risk-assessment]
+      summary: Generate a CAPA record from this FMEA entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: entryId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "201":
+          description: CAPA created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  capaId: { type: integer }
+                  capaNumber: { type: string }
+
+  /risk-assessments/{id}/entries/{entryId}/generate-cc:
+    post:
+      operationId: generateCcFromEntry
+      tags: [risk-assessment]
+      summary: Generate a Change Control record from this FMEA entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: entryId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "201":
+          description: Change Control created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  changeControlId: { type: integer }
+                  changeControlNumber: { type: string }
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    DashboardSummary:
+      type: object
+      required: [monthLabel, totalDeviations, newDeviations, closedDeviations, openCapa, capaDue30, changeControlsInReview, overdueDeviations, overdueErs]
+      properties:
+        monthLabel:
+          type: string
+        totalDeviations:
+          type: integer
+        newDeviations:
+          type: integer
+        closedDeviations:
+          type: integer
+        openCapa:
+          type: integer
+        capaDue30:
+          type: integer
+        changeControlsInReview:
+          type: integer
+        overdueDeviations:
+          type: integer
+        overdueErs:
+          type: integer
+
+    DashboardMetrics:
+      type: object
+      required: [labels, deviations, trendLabels, trendNew, trendClosed]
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        deviations:
+          type: array
+          items:
+            type: integer
+        trendLabels:
+          type: array
+          items:
+            type: string
+        trendNew:
+          type: array
+          items:
+            type: integer
+        trendClosed:
+          type: array
+          items:
+            type: integer
+
+    ActivityItem:
+      type: object
+      required: [id, type, title, number, action, user, timestamp, status]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [deviation, capa, changecontrol]
+        title:
+          type: string
+        number:
+          type: string
+        action:
+          type: string
+        user:
+          type: string
+        timestamp:
+          type: string
+        status:
+          type: string
+
+    StatusCounts:
+      type: object
+      required: [open, inProgress, closed, overdue]
+      properties:
+        open:
+          type: integer
+        inProgress:
+          type: integer
+        closed:
+          type: integer
+        overdue:
+          type: integer
+
+    DeviationCounts:
+      type: object
+      required: [total, open, closed, overdue, byType]
+      properties:
+        total:
+          type: integer
+        open:
+          type: integer
+        closed:
+          type: integer
+        overdue:
+          type: integer
+        byType:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountByLabel"
+
+    CapaCounts:
+      type: object
+      required: [total, open, closed, due30, overdue]
+      properties:
+        total:
+          type: integer
+        open:
+          type: integer
+        closed:
+          type: integer
+        due30:
+          type: integer
+        overdue:
+          type: integer
+
+    CountByLabel:
+      type: object
+      required: [label, count]
+      properties:
+        label:
+          type: string
+        count:
+          type: integer
+
+    Deviation:
+      type: object
+      required: [id, deviationNumber, title, deviationType, status, eventDate, detectionDate, dueDate, areaResponsible, qaExpert, isOverdue, updatedAt]
+      properties:
+        id:
+          type: integer
+        deviationNumber:
+          type: string
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        immediateAction:
+          type: ["string", "null"]
+        deviationType:
+          type: string
+        location:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        status:
+          type: string
+        eventDate:
+          type: string
+        detectionDate:
+          type: string
+        dueDate:
+          type: string
+        extendedDate:
+          type: ["string", "null"]
+        areaResponsible:
+          type: string
+        qaExpert:
+          type: string
+        investigation:
+          type: ["string", "null"]
+        productImpact:
+          type: ["string", "null"]
+        gxpCompliance:
+          type: ["string", "null"]
+        gmpComment:
+          type: ["string", "null"]
+        rootCause:
+          type: ["string", "null"]
+        rootCauseCategory:
+          type: ["string", "null"]
+        solvingMethod:
+          type: ["string", "null"]
+        isRepeatedDeviation:
+          type: ["boolean", "null"]
+        repeatedDeviationComment:
+          type: ["string", "null"]
+        capaNeeded:
+          type: ["boolean", "null"]
+        capaComment:
+          type: ["string", "null"]
+        erNeeded:
+          type: ["boolean", "null"]
+        erComment:
+          type: ["string", "null"]
+        requiresInvestigation:
+          type: ["boolean", "null"]
+        qaComment:
+          type: ["string", "null"]
+        completionComment:
+          type: ["string", "null"]
+        eventPriority:
+          type: ["string", "null"]
+        areaResponsibleComment:
+          type: ["string", "null"]
+        investigationLeader:
+          type: ["string", "null"]
+        assignedExpert:
+          type: ["string", "null"]
+        riskManager:
+          type: ["string", "null"]
+        assignedAdditionalQa:
+          type: ["string", "null"]
+        extendedDateComment:
+          type: ["string", "null"]
+        barrier:
+          type: ["string", "null"]
+        secondBarrier:
+          type: ["string", "null"]
+        teamMembers:
+          type: ["string", "null"]
+        rmPotentialRisk:
+          type: ["boolean", "null"]
+        rmComment:
+          type: ["string", "null"]
+        operation:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        batchLotNumber:
+          type: ["string", "null"]
+        isOverdue:
+          type: boolean
+        workflowStatus:
+          type: ["string", "null"]
+        areaRejectReason:
+          type: ["string", "null"]
+        qaRejectReason:
+          type: ["string", "null"]
+        classification:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeviationListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deviation"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    DeviationInput:
+      type: object
+      required: [title, deviationType, eventDate, detectionDate, areaResponsible, qaExpert]
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        immediateAction:
+          type: ["string", "null"]
+        deviationType:
+          type: string
+        location:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        eventDate:
+          type: string
+        detectionDate:
+          type: string
+        areaResponsible:
+          type: string
+        qaExpert:
+          type: string
+        status:
+          type: ["string", "null"]
+        operation:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        batchLotNumber:
+          type: ["string", "null"]
+        eventPriority:
+          type: ["string", "null"]
+        classification:
+          type: ["string", "null"]
+
+    DeviationUpdate:
+      type: object
+      properties:
+        title:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        immediateAction:
+          type: ["string", "null"]
+        deviationType:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        extendedDate:
+          type: ["string", "null"]
+        investigation:
+          type: ["string", "null"]
+        productImpact:
+          type: ["string", "null"]
+        gxpCompliance:
+          type: ["string", "null"]
+        gmpComment:
+          type: ["string", "null"]
+        rootCause:
+          type: ["string", "null"]
+        rootCauseCategory:
+          type: ["string", "null"]
+        solvingMethod:
+          type: ["string", "null"]
+        isRepeatedDeviation:
+          type: ["boolean", "null"]
+        repeatedDeviationComment:
+          type: ["string", "null"]
+        capaNeeded:
+          type: ["boolean", "null"]
+        capaComment:
+          type: ["string", "null"]
+        erNeeded:
+          type: ["boolean", "null"]
+        erComment:
+          type: ["string", "null"]
+        requiresInvestigation:
+          type: ["boolean", "null"]
+        qaComment:
+          type: ["string", "null"]
+        completionComment:
+          type: ["string", "null"]
+        eventPriority:
+          type: ["string", "null"]
+        areaResponsibleComment:
+          type: ["string", "null"]
+        investigationLeader:
+          type: ["string", "null"]
+        assignedExpert:
+          type: ["string", "null"]
+        riskManager:
+          type: ["string", "null"]
+        assignedAdditionalQa:
+          type: ["string", "null"]
+        extendedDateComment:
+          type: ["string", "null"]
+        barrier:
+          type: ["string", "null"]
+        secondBarrier:
+          type: ["string", "null"]
+        teamMembers:
+          type: ["string", "null"]
+        rmPotentialRisk:
+          type: ["boolean", "null"]
+        rmComment:
+          type: ["string", "null"]
+        operation:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        batchLotNumber:
+          type: ["string", "null"]
+        classification:
+          type: ["string", "null"]
+
+    Capa:
+      type: object
+      required: [id, capaNumber, title, capaType, status, creationDate, initialPlannedDate, implementationLeader, location, isOverdue, updatedAt]
+      properties:
+        id:
+          type: integer
+        capaNumber:
+          type: string
+        deviationId:
+          type: ["integer", "null"]
+        deviationNumber:
+          type: ["string", "null"]
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        capaType:
+          type: string
+        status:
+          type: string
+        creationDate:
+          type: string
+        initialPlannedDate:
+          type: string
+        updatedPlannedDate:
+          type: ["string", "null"]
+        extendComment:
+          type: ["string", "null"]
+        implementationDate:
+          type: ["string", "null"]
+        implementationLeader:
+          type: string
+        implementationSummary:
+          type: ["string", "null"]
+        closeComment:
+          type: ["string", "null"]
+        location:
+          type: string
+        externalReferences:
+          type: ["string", "null"]
+        specificAttribute:
+          type: ["string", "null"]
+        isOverdue:
+          type: boolean
+        workflowStatus:
+          type: ["string", "null"]
+        qaRejectReason:
+          type: ["string", "null"]
+        extensionRequestedDate:
+          type: ["string", "null"]
+        extensionRequestedReason:
+          type: ["string", "null"]
+        extensionRequestedBy:
+          type: ["string", "null"]
+        sourceType:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    CapaListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Capa"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    CapaInput:
+      type: object
+      required: [title, capaType, initialPlannedDate, implementationLeader, location]
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        capaType:
+          type: string
+        deviationId:
+          type: ["integer", "null"]
+        initialPlannedDate:
+          type: string
+        implementationLeader:
+          type: string
+        location:
+          type: string
+        externalReferences:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        sourceType:
+          type: ["string", "null"]
+
+    CapaUpdate:
+      type: object
+      properties:
+        title:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        capaType:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        externalReferences:
+          type: ["string", "null"]
+        initialPlannedDate:
+          type: ["string", "null"]
+        implementationLeader:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        updatedPlannedDate:
+          type: ["string", "null"]
+        extendComment:
+          type: ["string", "null"]
+        implementationDate:
+          type: ["string", "null"]
+        implementationSummary:
+          type: ["string", "null"]
+        closeComment:
+          type: ["string", "null"]
+        specificAttribute:
+          type: ["string", "null"]
+        sourceType:
+          type: ["string", "null"]
+
+    ChangeControl:
+      type: object
+      required: [id, changeControlNumber, title, changeType, status, plannedImplementationDate, currentSituation, proposedSituation, location, hierarchicResponsible, siteCoordinator, updatedAt]
+      properties:
+        id:
+          type: integer
+        changeControlNumber:
+          type: string
+        title:
+          type: string
+        changeType:
+          type: string
+        status:
+          type: string
+        riskClassification:
+          type: ["string", "null"]
+        plannedImplementationDate:
+          type: string
+        currentSituation:
+          type: string
+        proposedSituation:
+          type: string
+        location:
+          type: string
+        hierarchicResponsible:
+          type: string
+        siteCoordinator:
+          type: string
+        justification:
+          type: ["string", "null"]
+        justificationType:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        validationImpact:
+          type: ["string", "null"]
+        validationRequired:
+          type: ["boolean", "null"]
+        regulatoryImpact:
+          type: ["string", "null"]
+        regulatoryFilingRequired:
+          type: ["boolean", "null"]
+        hrComment:
+          type: ["string", "null"]
+        hrRejectionReason:
+          type: ["string", "null"]
+        scComment:
+          type: ["string", "null"]
+        scRejectionReason:
+          type: ["string", "null"]
+        pirComment:
+          type: ["string", "null"]
+        pirDate:
+          type: ["string", "null"]
+        pirOutcome:
+          type: ["string", "null"]
+        closeComment:
+          type: ["string", "null"]
+        capaId:
+          type: ["integer", "null"]
+        capaNumber:
+          type: ["string", "null"]
+        deviationId:
+          type: ["integer", "null"]
+        deviationNumber:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    ChangeControlListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChangeControl"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    ChangeControlInput:
+      type: object
+      required: [title, changeType, plannedImplementationDate, currentSituation, proposedSituation, location, hierarchicResponsible, siteCoordinator, justification]
+      properties:
+        title:
+          type: string
+        changeType:
+          type: string
+        riskClassification:
+          type: ["string", "null"]
+        plannedImplementationDate:
+          type: string
+        currentSituation:
+          type: string
+        proposedSituation:
+          type: string
+        location:
+          type: string
+        hierarchicResponsible:
+          type: string
+        siteCoordinator:
+          type: string
+        justification:
+          type: string
+        justificationType:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        validationImpact:
+          type: ["string", "null"]
+        validationRequired:
+          type: ["boolean", "null"]
+        regulatoryImpact:
+          type: ["string", "null"]
+        regulatoryFilingRequired:
+          type: ["boolean", "null"]
+        status:
+          type: ["string", "null"]
+        capaId:
+          type: ["integer", "null"]
+        capaNumber:
+          type: ["string", "null"]
+        deviationId:
+          type: ["integer", "null"]
+        deviationNumber:
+          type: ["string", "null"]
+
+    ChangeControlUpdate:
+      type: object
+      properties:
+        title:
+          type: ["string", "null"]
+        changeType:
+          type: ["string", "null"]
+        riskClassification:
+          type: ["string", "null"]
+        plannedImplementationDate:
+          type: ["string", "null"]
+        currentSituation:
+          type: ["string", "null"]
+        proposedSituation:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        hierarchicResponsible:
+          type: ["string", "null"]
+        siteCoordinator:
+          type: ["string", "null"]
+        justification:
+          type: ["string", "null"]
+        justificationType:
+          type: ["string", "null"]
+        equipment:
+          type: ["string", "null"]
+        products:
+          type: ["string", "null"]
+        externalReference:
+          type: ["string", "null"]
+        validationImpact:
+          type: ["string", "null"]
+        validationRequired:
+          type: ["boolean", "null"]
+        regulatoryImpact:
+          type: ["string", "null"]
+        regulatoryFilingRequired:
+          type: ["boolean", "null"]
+        status:
+          type: ["string", "null"]
+        hrComment:
+          type: ["string", "null"]
+        hrRejectionReason:
+          type: ["string", "null"]
+        scComment:
+          type: ["string", "null"]
+        scRejectionReason:
+          type: ["string", "null"]
+        pirComment:
+          type: ["string", "null"]
+        pirDate:
+          type: ["string", "null"]
+        pirOutcome:
+          type: ["string", "null"]
+        closeComment:
+          type: ["string", "null"]
+
+    ChangeControlCloseInput:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          type: string
+
+    ChangeControlRejectInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+
+    CcExpertReview:
+      type: object
+      required: [id, changeControlId, departmentName, managerName, expectedDate, createdAt]
+      properties:
+        id:
+          type: integer
+        changeControlId:
+          type: integer
+        departmentName:
+          type: string
+        managerName:
+          type: string
+        expectedDate:
+          type: string
+        hasImpact:
+          type: ["boolean", "null"]
+        hasQualityImpact:
+          type: ["boolean", "null"]
+        comment:
+          type: ["string", "null"]
+        actualDate:
+          type: ["string", "null"]
+        notApplicable:
+          type: ["boolean", "null"]
+        naReason:
+          type: ["string", "null"]
+        submittedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    CcExpertReviewListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CcExpertReview"
+
+    CcExpertReviewBulkInput:
+      type: object
+      required: [assignments]
+      properties:
+        assignments:
+          type: array
+          items:
+            type: object
+            required: [departmentName, managerName, expectedDate]
+            properties:
+              departmentName:
+                type: string
+              managerName:
+                type: string
+              expectedDate:
+                type: string
+
+    CcExpertReviewUpdate:
+      type: object
+      properties:
+        hasImpact:
+          type: ["boolean", "null"]
+        hasQualityImpact:
+          type: ["boolean", "null"]
+        comment:
+          type: ["string", "null"]
+        actualDate:
+          type: ["string", "null"]
+        notApplicable:
+          type: ["boolean", "null"]
+        naReason:
+          type: ["string", "null"]
+
+    CapaImplLeaderReassign:
+      type: object
+      required: [newLeader]
+      properties:
+        newLeader:
+          type: string
+
+    CcExpertReviewReassign:
+      type: object
+      required: [managerName]
+      properties:
+        managerName:
+          type: string
+        expectedDate:
+          type: ["string", "null"]
+
+    CcWorkPlan:
+      type: object
+      required: [id, changeControlId, title, responsiblePerson, allocatedWorks, expectedDate, createdAt]
+      properties:
+        id:
+          type: integer
+        changeControlId:
+          type: integer
+        title:
+          type: string
+        responsiblePerson:
+          type: string
+        allocatedWorks:
+          type: string
+        expectedDate:
+          type: string
+        actualDate:
+          type: ["string", "null"]
+        worksComment:
+          type: ["string", "null"]
+        submittedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    CcWorkPlanListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CcWorkPlan"
+
+    CcWorkPlanBulkInput:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [title, responsiblePerson, allocatedWorks, expectedDate]
+            properties:
+              title:
+                type: string
+              responsiblePerson:
+                type: string
+              allocatedWorks:
+                type: string
+              expectedDate:
+                type: string
+
+    CcWorkPlanUpdate:
+      type: object
+      properties:
+        actualDate:
+          type: ["string", "null"]
+        worksComment:
+          type: ["string", "null"]
+
+    User:
+      type: object
+      required: [id, name, email, roles, status, mustChangePassword]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        department:
+          type: ["string", "null"]
+        status:
+          type: string
+        mustChangePassword:
+          type: boolean
+
+    UserListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    UserInput:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: ["string", "null"]
+        roles:
+          type: array
+          items:
+            type: string
+        department:
+          type: ["string", "null"]
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        roles:
+          type: array
+          items:
+            type: string
+        department:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        password:
+          type: ["string", "null"]
+        mustChangePassword:
+          type: ["boolean", "null"]
+
+    UserRoleDefinition:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    UserRoleDefinitionInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthUser:
+      type: object
+      required: [id, name, email, roles, mustChangePassword]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        mustChangePassword:
+          type: boolean
+
+    AuditLog:
+      type: object
+      required: [id, userName, action, module, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        userName:
+          type: string
+        action:
+          type: string
+        module:
+          type: string
+        recordId:
+          type: ["integer", "null"]
+        recordNumber:
+          type: ["string", "null"]
+        details:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    AuditLogListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditLog"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    AttachmentMeta:
+      type: object
+      required: [id, module, recordId, fileName, fileSize, mimeType, uploadedBy, uploadedAt]
+      properties:
+        id:
+          type: integer
+        module:
+          type: string
+        recordId:
+          type: integer
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+        mimeType:
+          type: string
+        uploadedBy:
+          type: string
+        uploadedAt:
+          type: string
+
+    EfficacyReview:
+      type: object
+      required: [id, capaId, status, reviewer, expectedDate, round, createdAt]
+      properties:
+        id:
+          type: integer
+        capaId:
+          type: integer
+        capaNumber:
+          type: ["string", "null"]
+        deviationNumber:
+          type: ["string", "null"]
+        status:
+          type: string
+        reviewer:
+          type: string
+        expectedDate:
+          type: string
+        reviewDate:
+          type: ["string", "null"]
+        instruction:
+          type: ["string", "null"]
+        criteria:
+          type: ["string", "null"]
+        review:
+          type: ["string", "null"]
+        outcome:
+          type: ["string", "null"]
+        round:
+          type: integer
+        followUpErId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    EfficacyReviewListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/EfficacyReview"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    EfficacyReviewInput:
+      type: object
+      required: [capaId, reviewer, expectedDate]
+      properties:
+        capaId:
+          type: integer
+        reviewer:
+          type: string
+        expectedDate:
+          type: string
+        instruction:
+          type: ["string", "null"]
+        criteria:
+          type: ["string", "null"]
+        round:
+          type: ["integer", "null"]
+
+    EfficacyReviewUpdate:
+      type: object
+      properties:
+        status:
+          type: ["string", "null"]
+        reviewer:
+          type: ["string", "null"]
+        expectedDate:
+          type: ["string", "null"]
+        reviewDate:
+          type: ["string", "null"]
+        instruction:
+          type: ["string", "null"]
+        criteria:
+          type: ["string", "null"]
+        review:
+          type: ["string", "null"]
+        outcome:
+          type: ["string", "null"]
+        followUpErId:
+          type: ["integer", "null"]
+
+    SettingOption:
+      type: object
+      required: [id, category, value, sortOrder, createdAt]
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        value:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+
+    SettingOptionInput:
+      type: object
+      required: [category, value]
+      properties:
+        category:
+          type: string
+        value:
+          type: string
+
+    DeviationLinkInput:
+      type: object
+      required: [relatedDeviationId]
+      properties:
+        relatedDeviationId:
+          type: integer
+
+    DeviationSimilarItem:
+      type: object
+      required: [id, deviationNumber, title, location, rootCauseCategory, eventDate, status, matchScore, matchedFields]
+      properties:
+        id:
+          type: integer
+        deviationNumber:
+          type: string
+        title:
+          type: string
+        location:
+          type: ["string", "null"]
+        rootCauseCategory:
+          type: ["string", "null"]
+        eventDate:
+          type: string
+        status:
+          type: string
+        workflowStatus:
+          type: ["string", "null"]
+        matchScore:
+          type: integer
+          description: Number of fields that matched (higher = more similar)
+        matchedFields:
+          type: array
+          items:
+            type: string
+          description: Field names that contributed to the match
+
+    DeviationRelatedLink:
+      type: object
+      required: [id, deviationId, relatedDeviationId, relatedDeviationNumber, relatedTitle, relatedStatus, createdAt]
+      properties:
+        id:
+          type: integer
+        deviationId:
+          type: integer
+        relatedDeviationId:
+          type: integer
+        relatedDeviationNumber:
+          type: string
+        relatedTitle:
+          type: string
+        relatedStatus:
+          type: string
+        relatedWorkflowStatus:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    RiskAssessment:
+      type: object
+      required: [id, assessmentNumber, title, assessmentType, status, initiatedBy, updatedAt]
+      properties:
+        id:
+          type: integer
+        assessmentNumber:
+          type: string
+        title:
+          type: string
+        assessmentType:
+          type: string
+        documentNumber:
+          type: ["string", "null"]
+        revision:
+          type: ["string", "null"]
+        scope:
+          type: ["string", "null"]
+        productProcess:
+          type: ["string", "null"]
+        regulatoryContext:
+          type: ["string", "null"]
+        riskAcceptanceCriteria:
+          type: ["string", "null"]
+        status:
+          type: string
+        workflowStatus:
+          type: ["string", "null"]
+        initiatedBy:
+          type: string
+        compiledByDesignation:
+          type: ["string", "null"]
+        approvedBy:
+          type: ["string", "null"]
+        approvalDate:
+          type: ["string", "null"]
+        reviewDate:
+          type: ["string", "null"]
+        approver1Area:
+          type: ["string", "null"]
+        approver1Name:
+          type: ["string", "null"]
+        approver1Designation:
+          type: ["string", "null"]
+        approver2Area:
+          type: ["string", "null"]
+        approver2Name:
+          type: ["string", "null"]
+        approver2Designation:
+          type: ["string", "null"]
+        riskIdentification:
+          type: ["string", "null"]
+        riskEvaluation:
+          type: ["string", "null"]
+        actionPlans:
+          type: ["string", "null"]
+        riskCommunication:
+          type: ["string", "null"]
+        conclusion:
+          type: ["string", "null"]
+        closeComment:
+          type: ["string", "null"]
+        qaRejectReason:
+          type: ["string", "null"]
+        riskClass:
+          type: ["string", "null"]
+        nextReviewDate:
+          type: ["string", "null"]
+        decisionTreeData:
+          type: ["string", "null"]
+        sopReference:
+          type: ["string", "null"]
+        raArea:
+          type: ["string", "null"]
+        methodology:
+          type: ["string", "null"]
+        riskAnalysis:
+          type: ["string", "null"]
+        riskControl:
+          type: ["string", "null"]
+        riskMonitoring:
+          type: ["string", "null"]
+        riskVersion:
+          type: integer
+        parentAssessmentId:
+          type: ["integer", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    RiskAssessmentListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskAssessment"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    RiskAssessmentRejectInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+
+    RiskAssessmentInput:
+      type: object
+      required: [title, assessmentType, initiatedBy]
+      properties:
+        title:
+          type: string
+        assessmentType:
+          type: string
+        documentNumber:
+          type: ["string", "null"]
+        revision:
+          type: ["string", "null"]
+        scope:
+          type: ["string", "null"]
+        productProcess:
+          type: ["string", "null"]
+        regulatoryContext:
+          type: ["string", "null"]
+        riskAcceptanceCriteria:
+          type: ["string", "null"]
+        initiatedBy:
+          type: string
+        compiledByDesignation:
+          type: ["string", "null"]
+        reviewDate:
+          type: ["string", "null"]
+        approver1Area:
+          type: ["string", "null"]
+        approver1Name:
+          type: ["string", "null"]
+        approver1Designation:
+          type: ["string", "null"]
+        approver2Area:
+          type: ["string", "null"]
+        approver2Name:
+          type: ["string", "null"]
+        approver2Designation:
+          type: ["string", "null"]
+        riskIdentification:
+          type: ["string", "null"]
+        riskEvaluation:
+          type: ["string", "null"]
+        actionPlans:
+          type: ["string", "null"]
+        riskCommunication:
+          type: ["string", "null"]
+        conclusion:
+          type: ["string", "null"]
+        riskClass:
+          type: ["string", "null"]
+        nextReviewDate:
+          type: ["string", "null"]
+        decisionTreeData:
+          type: ["string", "null"]
+        sopReference:
+          type: ["string", "null"]
+        raArea:
+          type: ["string", "null"]
+        methodology:
+          type: ["string", "null"]
+        riskAnalysis:
+          type: ["string", "null"]
+        riskControl:
+          type: ["string", "null"]
+        riskMonitoring:
+          type: ["string", "null"]
+
+    FmeaEntry:
+      type: object
+      required: [id, assessmentId, processStep, failureMode, severity, occurrence, detection, rpn, riskLevel, updatedAt]
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        sortOrder:
+          type: integer
+        processStep:
+          type: string
+        failureMode:
+          type: string
+        potentialEffects:
+          type: ["string", "null"]
+        severity:
+          type: integer
+        potentialCauses:
+          type: ["string", "null"]
+        occurrence:
+          type: integer
+        currentControlsPrevention:
+          type: ["string", "null"]
+        currentControlsDetection:
+          type: ["string", "null"]
+        detection:
+          type: integer
+        rpn:
+          type: integer
+        riskLevel:
+          type: string
+        recommendedAction:
+          type: ["string", "null"]
+        responsiblePerson:
+          type: ["string", "null"]
+        targetDate:
+          type: ["string", "null"]
+        actionStatus:
+          type: ["string", "null"]
+        actionTaken:
+          type: ["string", "null"]
+        revisedSeverity:
+          type: ["integer", "null"]
+        revisedOccurrence:
+          type: ["integer", "null"]
+        revisedDetection:
+          type: ["integer", "null"]
+        revisedRpn:
+          type: ["integer", "null"]
+        revisedRiskLevel:
+          type: ["string", "null"]
+        residualRiskAcceptable:
+          type: ["string", "null"]
+        residualRiskJustification:
+          type: ["string", "null"]
+        res:
+          type: integer
+        revisedRes:
+          type: ["integer", "null"]
+        processStepTemplate:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    FmeaEntryListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FmeaEntry"
+
+    FmeaEntryInput:
+      type: object
+      required: [processStep, failureMode, severity, occurrence, detection]
+      properties:
+        sortOrder:
+          type: integer
+        processStep:
+          type: string
+        failureMode:
+          type: string
+        potentialEffects:
+          type: ["string", "null"]
+        severity:
+          type: integer
+        potentialCauses:
+          type: ["string", "null"]
+        occurrence:
+          type: integer
+        currentControlsPrevention:
+          type: ["string", "null"]
+        currentControlsDetection:
+          type: ["string", "null"]
+        detection:
+          type: integer
+        recommendedAction:
+          type: ["string", "null"]
+        responsiblePerson:
+          type: ["string", "null"]
+        targetDate:
+          type: ["string", "null"]
+        actionStatus:
+          type: ["string", "null"]
+        actionTaken:
+          type: ["string", "null"]
+        revisedSeverity:
+          type: ["integer", "null"]
+        revisedOccurrence:
+          type: ["integer", "null"]
+        revisedDetection:
+          type: ["integer", "null"]
+        residualRiskAcceptable:
+          type: ["string", "null"]
+        residualRiskJustification:
+          type: ["string", "null"]
+        processStepTemplate:
+          type: ["string", "null"]
+        res:
+          type: ["integer", "null"]
+        revisedRes:
+          type: ["integer", "null"]
+
+    RaTeamMember:
+      type: object
+      required: [id, assessmentId, name, area, role, createdAt]
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        name:
+          type: string
+        area:
+          type: string
+        designation:
+          type: ["string", "null"]
+        role:
+          type: string
+        acknowledgedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    RaTeamMemberInput:
+      type: object
+      required: [name, area]
+      properties:
+        name:
+          type: string
+        area:
+          type: string
+        designation:
+          type: ["string", "null"]
+        role:
+          type: string
+
+    RaTeamMemberListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaTeamMember"
+
+    RaCommunicationEntry:
+      type: object
+      required: [id, assessmentId, communicatedTo, method, communicationDate, summary, loggedBy, createdAt]
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        communicatedTo:
+          type: string
+        method:
+          type: string
+        communicationDate:
+          type: string
+        summary:
+          type: string
+        loggedBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    RaCommunicationEntryInput:
+      type: object
+      required: [communicatedTo, method, communicationDate, summary]
+      properties:
+        communicatedTo:
+          type: string
+        method:
+          type: string
+        communicationDate:
+          type: string
+        summary:
+          type: string
+
+    RaCommunicationEntryListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaCommunicationEntry"
+
+    RaReviewReport:
+      type: object
+      required: [id, assessmentId, rarrNumber, reviewedBy, reviewDate, outcome, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        rarrNumber:
+          type: string
+        reviewedBy:
+          type: string
+        reviewDate:
+          type: string
+        outcome:
+          type: string
+        newReviewDate:
+          type: ["string", "null"]
+        deviationsReviewed:
+          type: ["string", "null"]
+        changesReviewed:
+          type: ["string", "null"]
+        newRisksIdentified:
+          type: ["string", "null"]
+        mitigationsAdhered:
+          type: ["string", "null"]
+        recommendReassessment:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RaReviewReportInput:
+      type: object
+      required: [reviewedBy, reviewDate, outcome]
+      properties:
+        reviewedBy:
+          type: string
+        reviewDate:
+          type: string
+        outcome:
+          type: string
+        newReviewDate:
+          type: ["string", "null"]
+        deviationsReviewed:
+          type: ["string", "null"]
+        changesReviewed:
+          type: ["string", "null"]
+        newRisksIdentified:
+          type: ["string", "null"]
+        mitigationsAdhered:
+          type: ["string", "null"]
+        recommendReassessment:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+
+    RaReviewReportListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaReviewReport"
+
+    RaLink:
+      type: object
+      required: [id, assessmentId, moduleType, moduleId, moduleNumber, linkedBy, createdAt]
+      properties:
+        id:
+          type: integer
+        assessmentId:
+          type: integer
+        moduleType:
+          type: string
+        moduleId:
+          type: integer
+        moduleNumber:
+          type: string
+        moduleTitle:
+          type: ["string", "null"]
+        linkedBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    RaLinkInput:
+      type: object
+      required: [moduleType, moduleId, moduleNumber]
+      properties:
+        moduleType:
+          type: string
+        moduleId:
+          type: integer
+        moduleNumber:
+          type: string
+        moduleTitle:
+          type: ["string", "null"]
+
+    RaLinkListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaLink"
+
+    RaClassifyInput:
+      type: object
+      required: [riskClass]
+      properties:
+        riskClass:
+          type: string
+        nextReviewDate:
+          type: ["string", "null"]
+        decisionTreeData:
+          type: ["string", "null"]
+
+    RaMasterPlanEntry:
+      type: object
+      required: [id, assessmentNumber, title, status, initiatedBy, riskVersion, updatedAt]
+      properties:
+        id:
+          type: integer
+        assessmentNumber:
+          type: string
+        title:
+          type: string
+        riskClass:
+          type: ["string", "null"]
+        status:
+          type: string
+        initiatedBy:
+          type: string
+        approvalDate:
+          type: ["string", "null"]
+        nextReviewDate:
+          type: ["string", "null"]
+        raArea:
+          type: ["string", "null"]
+        riskVersion:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+
+    RaMasterPlanResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaMasterPlanEntry"
