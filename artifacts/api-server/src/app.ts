@@ -48,6 +48,7 @@ import fs from "node:fs";
       store: new PgSession({
         conString: pgConnectionString,
         tableName: "qms_sessions",
+        createTableIfMissing: true,
       }),
       secret: sessionSecret,
       resave: false,
