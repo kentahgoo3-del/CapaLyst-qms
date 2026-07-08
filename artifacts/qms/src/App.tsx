@@ -176,6 +176,7 @@ function Router() {
           <Route path="/settings">
             <AdminGuard><SettingsPage /></AdminGuard>
           </Route>
+
           <Route component={NotFound} />
         </Switch>
       </AppLayout>

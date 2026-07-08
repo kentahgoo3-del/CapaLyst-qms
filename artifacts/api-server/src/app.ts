@@ -1,4 +1,6 @@
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
+import path from "node:path";
+import fs from "node:fs";
   import cors from "cors";
   import pinoHttp from "pino-http";
   import session from "express-session";
@@ -104,6 +106,18 @@ import express, { type Express, type Request, type Response, type NextFunction }
   });
 
   app.use("/api", router);
+
+  /* ── Serve QMS frontend in production ── */
+  if (process.env["NODE_ENV"] === "production") {
+    const publicDir = path.resolve(process.cwd(), "artifacts/qms/dist/public");
+    if (fs.existsSync(publicDir)) {
+      app.use(express.static(publicDir));
+      // SPA fallback — catch all non-API routes and serve index.html
+      app.get("/{*splat}", (_req: Request, res: Response) => {
+        res.sendFile(path.join(publicDir, "index.html"));
+      });
+    }
+  }
 
   /* ── Startup schema migration (idempotent) ── */
   if (pgConnectionString) {
